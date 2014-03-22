@@ -1,10 +1,14 @@
 package com.sandyprojects.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -28,8 +32,8 @@ public class Company implements Serializable {
 	@Column(name="INDUSTRY")
 	private String industry;
 	
-	@OneToMany
-	private Set<Employee> employees;
+	@OneToMany(mappedBy="company")
+	private List<Employee> employee = new ArrayList<Employee>();
 	
 	public int getId() {
 		return id;
@@ -49,10 +53,11 @@ public class Company implements Serializable {
 	public void setIndustry(String industry) {
 		this.industry = industry;
 	}
-	public Set<Employee> getEmployees() {
-		return employees;
+	public List<Employee> getEmployee() {
+		return employee;
 	}
-	public void setEmployees(Set<Employee> employees) {
-		this.employees = employees;
+	public void setEmployee(List<Employee> employee) {
+		this.employee = employee;
 	}
+
 }

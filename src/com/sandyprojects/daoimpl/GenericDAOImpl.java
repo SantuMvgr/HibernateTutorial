@@ -2,30 +2,28 @@ package com.sandyprojects.daoimpl;
 
 import java.io.Serializable;
 
-import org.hibernate.Session;
-
 import com.sandyprojects.dao.GenericDAO;
 import com.sandyprojects.util.HibernateUtil;
 
 public class GenericDAOImpl<T, ID extends Serializable> implements GenericDAO<T, ID> {
 
-	private HibernateUtil hibernateUtil = new HibernateUtil();
-	private Session session;
-	
-	public GenericDAOImpl() {
-		session = hibernateUtil.buildSessionFactory().openSession();
-	}
+	protected HibernateUtil hibernateUtil = new HibernateUtil();
 	
 	@Override
 	public void save(T object) {
-		session.beginTransaction();
-		session.save(object);
-		session.getTransaction().commit();
+		HibernateUtil.startTransaction();
+		HibernateUtil.getCurrentSession().save(object);
+		HibernateUtil.commitTransaction();
+		HibernateUtil.releaseConnection();
+		
 	}
 
 	@Override
 	public void delete(T object) {
-		session.delete(object);		
+		HibernateUtil.startTransaction();
+		HibernateUtil.getCurrentSession().delete(object);
+		HibernateUtil.commitTransaction();
+		HibernateUtil.releaseConnection();
 	}
 
 	@Override

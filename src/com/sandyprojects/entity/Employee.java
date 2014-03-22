@@ -2,14 +2,30 @@ package com.sandyprojects.entity;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.DynamicUpdate;
+
+
+@NamedQueries({
+	@NamedQuery(
+		name="Employee.findByCompany", 
+		query="select e from Employee e where e.company.id=:id"),
+	
+	@NamedQuery(
+		name="Employee.findByRole",
+		query="select e from Employee e where e.role.id=:id")
+	})
+
 
 @Entity
 @Table(name="EMPLOYEE")
@@ -28,12 +44,10 @@ public class Employee implements Serializable {
 	@Column(name="ENAME")
 	private String name;
 	
-	@ManyToOne
-	@JoinColumn(name="CNAME")
+	@ManyToOne(cascade=CascadeType.ALL)
 	private Company company;
 	
-	@ManyToOne
-	@JoinColumn(name="NAME")
+	@ManyToOne(cascade=CascadeType.ALL)
 	private Role role;
 	
 	public long getId() {

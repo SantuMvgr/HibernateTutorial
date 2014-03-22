@@ -7,31 +7,57 @@ import org.hibernate.cfg.Configuration;
 
 public class HibernateUtil {
 	
-	private SessionFactory sessionFactory;
+	private static SessionFactory sessionFactory;
+	private static boolean initialized = false;
+	private static ThreadLocal<Session> currentSession = new ThreadLocal<Session>();
 	
-	public SessionFactory buildSessionFactory() {
+	public static void init() {
+		if(initialized) return;
 		Configuration configuration = new AnnotationConfiguration();
 		sessionFactory = configuration.configure().buildSessionFactory();
 		
-		return sessionFactory;
+		initialized = true;
 	}
 	
-	public Session openSession() {
+	
+	public static void setSessionFactory(SessionFactory sessionFactory) {
+		HibernateUtil.sessionFactory = sessionFactory;
+	}
+	
+	public static Session startTransaction() {
+		Session session = currentSession.get();
+		if(session != null) {
+			System.out.println("Attempt to create nested transaction!");
+		}
+		session = sessionFactory.openSession();
+		session.beginTransaction();
+		currentSession.set(session);
+		
+		return session;
+	}
+	
+	public static Session getNewSession() {
 		return sessionFactory.openSession();
 	}
 	
-	public void closeSession(Session session) {
+	public static Session getCurrentSession() {
+		return currentSession.get();
+	}
+	
+	public static void commitTransaction() {
+		Session session = currentSession.get();
+		session.getTransaction().commit();
+	}
+	
+	public static void rollbackTransaction() {
+		Session session = currentSession.get();
+		session.getTransaction().rollback();
+	}
+	
+	public static void releaseConnection() {
+		Session session = currentSession.get();
+		currentSession.remove();
 		session.close();
-	}
-	
-	public void beginTransaction() {
-		if(sessionFactory == null)
-			buildSessionFactory();
-			sessionFactory.openSession().beginTransaction();
-	}
-	
-	public void commitTransaction() {
-		sessionFactory.getCurrentSession().getTransaction().commit();
 	}
 	
 }
